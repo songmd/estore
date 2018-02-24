@@ -3,14 +3,16 @@ Server = {
   shopId: '70473716522e4d24932d3b0fdf71d736',
   user_token: wx.getStorageSync('user_token'),
   //登陆微信服务器及应用服务器
-  login: function (onSuccess, onFail) {
+  login: function (obj) {
     let that = this
+    if (!obj)
+      obj = {}
     wx.checkSession({
       success: function () {
         //session 未过期，并且在本生命周期一直有效
         that._loginServer({
           user_token: that.user_token
-        }, onSuccess, onFail)
+        }, obj.success, obj.fail)
       },
       fail: function () {
         //登录态过期
@@ -20,24 +22,73 @@ Server = {
               //发起网络请求
               that._loginServer({
                 js_code: res.code
-              }, onSuccess, onFail)
+              }, obj.success, obj.fail)
             } else {
               console.log('获取用户登录态失败！' + res)
-              if (onFail)
-                onFail()
+              if (obj.fail)
+                obj.fail()
             }
           },
           fail: function (res) {
             console.log('wx.login fail！' + res)
-            if (onFail)
-              onFail()
+            if (obj.fail)
+              obj.fail()
           }
         })
       }
     })
   },
+
+  //获取店铺信息
+  shopDetail: function (obj) {
+    if (!obj)
+      obj = {}
+    let url = `${this.serverUrl}/shops/${this.shopId}.json/`
+    this._requestHelper(url, {}, 'GET', obj.success, obj.fail)
+  },
+  //获取所有产品
+  listProduct: function (obj) {
+    if (!obj)
+      obj = {}
+    let url = `${this.serverUrl}/products.json/`
+    data = {
+      shop_id: this.shopId
+    }
+    this._requestHelper(url, data, 'GET', obj.success, obj.fail)
+  },
+  //获取所有订单
+  listOrder: function (obj) {
+    if (!obj)
+      obj = {}
+    if (!this.user_token) {
+      if (obj.fail)
+        obj.fail()
+      return
+    }
+    let url = `${this.serverUrl}/order/${this.user_token}.json/`
+    this._requestHelper(url, {}, 'GET', obj.success, obj.fail)
+  },
+  //下单
+  giveOrder: function (obj) {
+    if (!obj)
+      obj = {}
+    //需要先登陆
+    if (!this.user_token) {
+      if (obj.fail)
+        obj.fail()
+      return
+    }
+    let url = `${this.serverUrl}/order/${this.user_token}.json/`
+    this._requestHelper(url, obj.order, 'POST', obj.success, obj.fail)
+  },
+  askForPay: function (obj) {
+    if (!obj)
+      obj = {}
+    let url = `${this.serverUrl}/askforpay/`
+    this._requestHelper(url, obj.order_no, 'GET', obj.success, obj.fail)
+  },
   //登陆辅助函数
-  _loginServer: function (data, success, fail) {
+  _loginServer: function (data, onSuccess, onFail) {
     let that = this
     let url = `${that.serverUrl}/login/`
     let reqData = Object.assign({
@@ -50,40 +101,13 @@ Server = {
           that.user_token = resData['user_token']
           wx.setStorageSync('user_token', that.user_token)
         }
-        if (success) {
-          success()
+        if (onSuccess) {
+          onSuccess()
         }
-      } else if (fail) {
-        fail()
+      } else if (onFail) {
+        onFail()
       }
-    }, fail)
-  },
-  //获取店铺信息
-  shopDetail: function (onSuccess, onFail) {
-    let url = `${this.serverUrl}/shops/${this.shopId}.json/`
-    this._requestHelper(url, {}, 'GET', onSuccess, onFail)
-  },
-  //获取所有产品
-  listProduct: function (onSuccess, onFail) {
-    let url = `${this.serverUrl}/products.json/`
-    data = {
-      shop_id: this.shopId
-    }
-    this._requestHelper(url, data, 'GET', onSuccess, onFail)
-  },
-  //获取所有订单
-  listOrder: function (onSuccess, onFail) {
-    let url = `${this.serverUrl}/order/${this.user_token}.json/`
-    this._requestHelper(url, {}, 'GET', onSuccess, onFail)
-  },
-  //下单
-  giveOrder: function (order, onSuccess, onFail) {
-    let url = `${this.serverUrl}/order/${this.user_token}.json/`
-    this._requestHelper(url, order, 'POST', onSuccess, onFail)
-  },
-  askForPay: function (order_no, onSuccess, onFail) {
-    let url = `${this.serverUrl}/askforpay/`
-    this._requestHelper(url, order_no, 'GET', onSuccess, onFail)
+    }, onFail)
   },
   _requestHelper: function (url, data, method, onSuccess, onFail) {
     wx.request({

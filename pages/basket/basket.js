@@ -326,6 +326,14 @@ Page({
         quantity:list[index].number,
       })
     }
+    app.server.giveOrder(order,function(order_no){
+
+    },function(){
+      wx.hideLoading()
+      wx.showToast({
+        tititle:'服务器下单失败'
+      })
+    })
 
     let user_token = wx.getStorageSync('user_token')
       wx.request({
