@@ -58,62 +58,8 @@ Page({
   onLoad: function () {
     this.initEleWidth();
     this.onShow();
-    let that = this
-    let user_token = wx.getStorageSync('user_token')
-    wx.request({
-      url: `${app.serverUrl}/basketitem/${user_token}.json/`,
-      success: function (res) {
-        console.log(res.data)
-        that.setData({
-          basket: res.data,
-
-        })
-        // for test
-        // setTimeout(that.addBasketItem,3000)
-      },
-    })
-    // this.deleteBasketItem(1)
   },
-  deleteBasketItem: function (id) {
-    console.log('delete basket')
-    let that = this
-    let user_token = wx.getStorageSync('user_token')
-    // basket = that.data.basket
-    // basket.lines[0].price = 1.1
-    // console.log(basket)
-    let unitId = 2
-    wx.request({
-      url: `${app.serverUrl}/basketitem/${user_token}/${id}.json/`,
-      method: 'DELETE',
-      // data: basketunit,
-      success: function (res) {
-        console.log(res.data)
-      },
-    })
-  },
-  addBasketItem: function () {
-    console.log('update basket')
-    let that = this
-    let user_token = wx.getStorageSync('user_token')
-    // basket = that.data.basket
-    // basket.lines[0].price = 1.1
-    basketunit = {
-      product: 1,
-      price: 0.7,
-      quantity: 3,
-      basket: 2,
-      belong_customer: user_token
-    }
-    // console.log(basket)
-    wx.request({
-      url: `${app.serverUrl}/basketitem/${user_token}.json/`,
-      method: 'POST',
-      data: basketunit,
-      success: function (res) {
-        console.log(res.data)
-      },
-    })
-  },
+ 
   onShow: function () {
 
     shopList = wx.getStorageSync('ShopCarInfo')
@@ -316,50 +262,68 @@ Page({
     this.setGoodsList(this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), list);
   },
   toPayOrder: function () {
+    that = this
     wx.showLoading();
     var list = this.data.goodsList.list;
     let order = []
-    for (var index=0;index<list.length;index++) {
+    for (var index = 0; index < list.length; index++) {
       order.push({
-        product:list[index].id,
-        price:list[index].price,
-        quantity:list[index].number,
+        product: list[index].id,
+        price: list[index].price,
+        quantity: list[index].number,
       })
     }
-    app.server.giveOrder(order,function(order_no){
-
-    },function(){
-      wx.hideLoading()
-      wx.showToast({
-        tititle:'服务器下单失败'
-      })
-    })
-
-    let user_token = wx.getStorageSync('user_token')
-      wx.request({
-        url: `${app.serverUrl}/order/${user_token}.json/`,
-        method: 'POST',
-        data: order,
-        success: function (data,statusCode) {
-          if(statusCode==200){
-            wx.request({
-              url: 'https://URL',
-              data: {},
-              method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
-              // header: {}, // 设置请求的 header
-              success: function(res){
-                // success
-              },
-              fail: function() {
-                // fail
-              },
-              complete: function() {
-                // complete
-              }
+    app.server.giveOrder({
+      order: order,
+      success: function (order_no) {
+        //订单已经生成，购物车清空
+        that.deleteSelected()
+        app.server.askForPay({
+          order_no: order_no,
+          success: function (payData) {
+            if (payData.retcode == '0000') {
+              wx.requestPayment({
+                timeStamp: payData.timeStamp,
+                nonceStr: payData.nonceStr,
+                package: payData.package,
+                signType: 'MD5',
+                paySign: payData.sign,
+                'success': function (res) {
+                  wx.hideLoading()
+                  wx.showToast({
+                    title: '支付成功'
+                  })
+                },
+                'fail': function (res) {
+                  console.log(res)
+                  wx.hideLoading()
+                  wx.showToast({
+                    title: '微信支付失败'
+                  })
+                }
+              })
+            } else {
+              wx.hideLoading()
+              wx.showToast({
+                title: '请求支付失败，请查看你的订单，稍后再请求支付'
+              })
+            }
+          },
+          fail: function () {
+            wx.hideLoading()
+            wx.showToast({
+              title: '请求支付失败，请查看你的订单，稍后再请求支付'
             })
           }
-        },
-      })
+        })
+      },
+      fail: function () {
+        wx.hideLoading()
+        wx.showToast({
+          title: '服务器下单失败,请重新下单'
+        })
+      }
+    })
   },
   navigateToPayOrder: function () {
     wx.hideLoading();

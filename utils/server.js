@@ -81,12 +81,55 @@ Server = {
     let url = `${this.serverUrl}/order/${this.user_token}.json/`
     this._requestHelper(url, obj.order, 'POST', obj.success, obj.fail)
   },
+
+  //请求支付
   askForPay: function (obj) {
     if (!obj)
       obj = {}
     let url = `${this.serverUrl}/askforpay/`
     this._requestHelper(url, obj.order_no, 'GET', obj.success, obj.fail)
   },
+
+  // deleteBasketItem: function (id) {
+  //   console.log('delete basket')
+  //   let that = this
+  //   let user_token = wx.getStorageSync('user_token')
+  //   // basket = that.data.basket
+  //   // basket.lines[0].price = 1.1
+  //   // console.log(basket)
+  //   let unitId = 2
+  //   wx.request({
+  //     url: `${app.serverUrl}/basketitem/${user_token}/${id}.json/`,
+  //     method: 'DELETE',
+  //     // data: basketunit,
+  //     success: function (res) {
+  //       console.log(res.data)
+  //     },
+  //   })
+  // },
+  // addBasketItem: function () {
+  //   console.log('update basket')
+  //   let that = this
+  //   let user_token = wx.getStorageSync('user_token')
+  //   // basket = that.data.basket
+  //   // basket.lines[0].price = 1.1
+  //   basketunit = {
+  //     product: 1,
+  //     price: 0.7,
+  //     quantity: 3,
+  //     basket: 2,
+  //     belong_customer: user_token
+  //   }
+  //   // console.log(basket)
+  //   wx.request({
+  //     url: `${app.serverUrl}/basketitem/${user_token}.json/`,
+  //     method: 'POST',
+  //     data: basketunit,
+  //     success: function (res) {
+  //       console.log(res.data)
+  //     },
+  //   })
+  // },
   //登陆辅助函数
   _loginServer: function (data, onSuccess, onFail) {
     let that = this
