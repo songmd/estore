@@ -34,7 +34,8 @@ Page({
     var shopCarInfo = wx.getStorageSync('ShopCarInfo')
     let shopCarItem = {
       product: this.data.product,
-      quantity: this.data.buyNumber
+      quantity: this.data.buyNumber,
+      active:true
     }
     if(shopCarInfo.length == 0){
       shopCarInfo = [shopCarItem]

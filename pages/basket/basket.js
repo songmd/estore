@@ -8,26 +8,26 @@ Page({
       allSelect: true,
       noSelect: false,
       list: [
-        // {
-        //   active:true,
-        //   number:3,
-        //   name:'mac book pro 2016',
-        //   label:'dfd',
-        //   pic:'',
-        //   price:23.6
+        {
+          active:true,
+          number:3,
+          name:'mac book pro 2016',
+          label:'dfd',
+          pic:'',
+          price:23.6
 
 
-        // },
-        // {
-        //   active: true,
-        //   number:2,
-        //   name: 'ipad 33',
-        //   label: 'dfd',
-        //   pic: '',
-        //   price: 2.6
+        },
+        {
+          active: true,
+          number:2,
+          name: 'ipad 33',
+          label: 'dfd',
+          pic: '',
+          price: 2.6
 
 
-        // },
+        },
 
       ]
     },
@@ -35,25 +35,7 @@ Page({
 
     basket:null,
   },
-  onLoad: function () {
-    this.initEleWidth();
-    this.onShow();
-    let that = this
-    let user_token = wx.getStorageSync('user_token')
-    wx.request({
-      url: `${app.serverUrl}/basketitem/${user_token}.json/`,
-      success: function (res) {
-        console.log(res.data)
-        that.setData({
-          basket: res.data,
 
-        })
-        // for test
-        // setTimeout(that.addBasketItem,3000)
-      },
-    })
-    // this.deleteBasketItem(1)
-  },
   //获取元素自适应后的实际宽度
   getEleWidth: function (w) {
     var real = 0;
@@ -74,7 +56,25 @@ Page({
       delBtnWidth: delBtnWidth
     });
   },
-
+  onLoad: function () {
+    this.initEleWidth();
+    this.onShow();
+    let that = this
+    let user_token = wx.getStorageSync('user_token')
+    wx.request({
+      url: `${app.serverUrl}/basketitem/${user_token}.json/`,
+      success: function (res) {
+        console.log(res.data)
+        that.setData({
+          basket: res.data,
+          
+        })
+        // for test
+        // setTimeout(that.addBasketItem,3000)
+      },
+    })
+    // this.deleteBasketItem(1)
+  },
   deleteBasketItem: function(id) {
     console.log('delete basket')
     let that = this
@@ -110,31 +110,35 @@ Page({
     })    
   },
   onShow: function () {
-    // var shopList = [
-    //   {
-    //     active: true,
-    //     number: 3,
-    //     name: 'mac book pro 2016',
-    //     label: 'dfd',
-    //     pic: '',
-    //     price: 23.6
+    var shopList =  [
+      {
+        active: true,
+        number: 3,
+        name: 'mac book pro 2016',
+        label: 'dfd',
+        pic: '',
+        price: 23.6
 
 
-    //   },
-    //   {
-    //     active: true,
-    //     number: 2,
-    //     name: 'ipad 33',
-    //     label: 'dfd',
-    //     pic: '',
-    //     price: 2.6
+      },
+      {
+        active: true,
+        number: 2,
+        name: 'ipad 33',
+        label: 'dfd',
+        pic: '',
+        price: 2.6
 
 
-    //   },
-    // ]
+      },
+    ]
     // 获取购物车数据
-    // this.data.goodsList.list = wx.getStorageSync('ShopCarInfo');
-    this.setGoodsList(this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), wx.getStorageSync('ShopCarInfo'));
+    // var shopCarInfoMem = wx.getStorageSync('shopCarInfo');
+    // if (shopCarInfoMem && shopCarInfoMem.shopList) {
+    //   shopList = shopCarInfoMem.shopList
+    // }
+    this.data.goodsList.list = shopList;
+    this.setGoodsList(this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), shopList);
   },
   toIndexPage: function () {
     wx.switchTab({
