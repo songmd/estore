@@ -137,6 +137,7 @@ Page({
     // if (shopCarInfoMem && shopCarInfoMem.shopList) {
     //   shopList = shopCarInfoMem.shopList
     // }
+    shopList = wx.getStorageSync('ShopCarInfo')
     this.data.goodsList.list = shopList;
     this.setGoodsList(this.getSaveHide(), this.totalPrice(), this.allSelect(), this.noSelect(), shopList);
   },
@@ -258,16 +259,16 @@ Page({
         list: list
       }
     });
-    var shopCarInfo = {};
-    var tempNumber = 0;
-    shopCarInfo.shopList = list;
-    for (var i = 0; i < list.length; i++) {
-      tempNumber = tempNumber + list[i].number
-    }
-    shopCarInfo.shopNum = tempNumber;
+    // var shopCarInfo = {};
+    // var tempNumber = 0;
+    // shopCarInfo.shopList = list;
+    // for (var i = 0; i < list.length; i++) {
+    //   tempNumber = tempNumber + list[i].number
+    // }
+    // shopCarInfo.shopNum = tempNumber;
     wx.setStorage({
-      key: "shopCarInfo",
-      data: shopCarInfo
+      key: "ShopCarInfo",
+      data: list
     })
   },
   bindAllSelect: function () {
@@ -353,13 +354,16 @@ Page({
     }
     // 重新计算价格，判断库存
     var shopList = [];
-    var shopCarInfoMem = wx.getStorageSync('shopCarInfo');
-    if (shopCarInfoMem && shopCarInfoMem.shopList) {
-      // shopList = shopCarInfoMem.shopList
-      shopList = shopCarInfoMem.shopList.filter(entity => {
-        return entity.active;
-      });
-    }
+    var shopList = wx.getStorageSync('ShopCarInfo');
+    shopList = shopList.filter(entity => {
+      return entity.active;
+    });
+    // if (shopCarInfoMem && shopCarInfoMem.shopList) {
+    //   // shopList = shopCarInfoMem.shopList
+    //   shopList = shopCarInfoMem.shopList.filter(entity => {
+    //     return entity.active;
+    //   });
+    // }
     if (shopList.length == 0) {
       wx.hideLoading();
       return;

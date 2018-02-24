@@ -33,9 +33,12 @@ Page({
   addShopCar: function () {
     var shopCarInfo = wx.getStorageSync('ShopCarInfo')
     let shopCarItem = {
-      product: this.data.product,
-      quantity: this.data.buyNumber,
-      active:true
+      name:this.data.product.title,
+      number: this.data.buyNumber,
+      active:true,
+      id:this.data.product.id,
+      pic:this.data.product.primary_pic.pic,
+      price:(this.data.product.off_price ? this.data.product.off_price:this.data.product.price)
     }
     if(shopCarInfo.length == 0){
       shopCarInfo = [shopCarItem]
