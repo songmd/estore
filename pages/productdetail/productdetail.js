@@ -46,6 +46,11 @@ Page({
       shopCarInfo.push(shopCarItem)
     }
     wx.setStorageSync('ShopCarInfo',shopCarInfo)
+    wx.showToast({
+      title: '加入购物车成功',
+      icon: 'success',
+      duration: 2000
+    })
   },
   buyNow: function () {
 
