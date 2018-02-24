@@ -1,0 +1,29 @@
+<view scroll-y class="goods-detail-container">
+    <scroll-view scroll-y style="height: 960rpx;padding-left: 30rpx">
+        <view wx:for-items="{{product.pics}}" wx:key="{{index}}" data-id="{{index}}">
+            <image src="{{item.pic}}" mode="widthFix" lazy-load="true" />
+        </view>
+    </scroll-view>
+    <view class="popup-contents">
+
+        <view class="buy-num-box">
+            <view class="num-label">购买数量</view>
+            <view class="num-box">
+                <view class="num-jian {{buyNumber == buyNumMin ? 'hui': ''}}" bindtap="numJianTap">-</view>
+                <view class="num-input">
+                    <input type="number" value="{{buyNumber}}" disabled/>
+                </view>
+                <view class="num-jia {{buyNumber== buyNumMax ? 'hui': ''}}" bindtap="numJiaTap">+</view>
+            </view>
+            <view class="num-label">
+                总金额：{{price*buyNumber}} ¥
+            </view>
+        </view>
+         <view class="popup-join-btn"  bindtap="addShopCar">
+        加入购物车
+    </view>
+    <view class="popup-join-btn" bindtap="buyNow">
+        立即购买
+    </view> 
+    </view>
+</view>
